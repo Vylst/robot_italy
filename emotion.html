@@ -1,0 +1,83 @@
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+	<style>
+		body,html{
+			height:100%;
+			font-family: Arial, Helvetica, sans-serif;
+			margin:0;
+			padding:0;
+		}
+		h1{
+			color:white;
+			font-size=40px;
+		}
+		h2{
+			color:white; 
+			font-size=30px;
+			margin:35px;
+		}
+
+  </style>
+ </head>
+ <body style="background-color:black">
+	<center>
+		<h1>The emotion to learn is: </h1><h1 id="h1_e"> </h1>
+<!-- dimentsion big canvas: 600(w)*300(h) -->
+<canvas id="eye_l_u" width="300" height="150" style="position:fixed; top:20%; left:17%;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="eye_r_u" width="300" height="150" style="position:fixed; top:20%; right:17%;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="eye_l_d" width="300" height="150" style="position:fixed; top:40%; left:17%;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="eye_r_d" width="300" height="150" style="position:fixed; top:40%; right:17%;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="mouth" width="600" height="400" style="position:fixed; top:55%; left:30%;"></canvas>
+
+	<h2 style="position:fixed; top:80%;">Do you think this expression is coherent with the emotion ? 
+	<br><br>
+
+	<pre><input type="button" value="Coherent" onclick="send_coherent();"><input type="button" value="Incoherent" onclick="send_incoherent();"></pre></h2>
+	</center>
+
+ <script type="text/javascript" type="text/javascript">
+	var emotions = ['Happiness', 'Sadness', 'Fear','Disgust','Angry','Neutral','Surprise'];
+	var websocket = new WebSocket("ws://localhost:65432/");
+	/*set_expression();
+	function set_expression(){
+	var current_emotion = emotions[Math.floor(Math.random() * emotions.length)];
+	console.log(current_emotion)
+	document.getElementById("h1_e").innerHTML=current_emotion;
+	}*/
+	 websocket.onmessage = function(event){
+	 	console.log("message receive");
+	 	document.getElementById("h1_e").innerHTML=event.data; 
+	 } 
+
+ function send_coherent(){
+ 	console.log("Coherent")
+	websocket.send(0);
+ }
+ function send_incoherent(){
+ 	console.log("Incoherent")
+	websocket.send(1);
+ }
+
+ function send_feedback(){
+ 	if (document.getElementById("coherent").checked){
+ 		console.log("Coherent")
+ 		websocket.send(0);
+ 	}
+ 	if (document.getElementById("incoherent").checked){
+ 		 console.log("InCoherent")
+ 		websocket.send(1);
+		//SEND message to server
+	}
+ 	location.reload();
+ }
+ </script>
+
+</body>
+
+</html>

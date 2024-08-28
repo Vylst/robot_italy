@@ -1,0 +1,796 @@
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+	<style>
+		body,html{
+			height:100%;
+			font-family: Arial, Helvetica, sans-serif;
+			margin:0;
+			padding:0;
+		}
+		h1{
+			color:white;
+			font-size=40px;
+		}
+		h2{
+			color:white; 
+			font-size=30px;
+			margin:35px;
+		}
+
+  </style>
+ </head>
+ <body style="background-color:black">
+	<center>
+		<h1>The emotion to learn is: </h1><h1 id="h1_e"> </h1>
+<!-- dimentsion big canvas: 600(w)*300(h) -->
+<canvas id="eye_l_u" width="300" height="150" style="position:fixed; top:20%; left:17%;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="eye_r_u" width="300" height="150" style="position:fixed; top:20%; right:17%;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="eye_l_d" width="300" height="150" style="position:fixed; top:40%; left:17%;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="eye_r_d" width="300" height="150" style="position:fixed; top:40%; right:17%;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="mouth" width="600" height="400" style="position:fixed; top:55%; left:30%;"></canvas>
+
+	<h2 style="position:fixed; top:80%;">Do you think this expression is coherent with the emotion ? 
+	<br><br>
+	<input type="radio" name="feedback" id="coherent" value="coherent"><label>Coherent</label>
+	<input type="radio" name="feedback" id="incoherent" value="incoherent"><label>Incoherent</label>
+	<pre><input type="button" value="Submit" onclick="send_feedback();"></pre></h2>
+	</center>
+  <!--script src="js/draw_eyes.js"></script-->
+  <!--script src="js/draw_mouth.js"></script-->
+ <script type="text/javascript" type="text/javascript">
+	/*var emotions = ['Happiness', 'Sadness', 'Fear','Disgust','Angry','Neutral','Surprise'];
+	 websocket.onmessage = function(event){
+	 	console.log(event.data);
+		console.log("message receive");
+	 	document.getElementById("h1_e").innerHTML=event.data; 
+	 };*/
+	 var eyes_conf=-1
+	 websocket = new WebSocket("ws://127.0.0.1:6789/");
+     websocket.onmessage = function (event) {
+        data = JSON.parse(event.data);
+        console.log(data.action)
+        if(data.action=='expression'){
+        	console.log("I am here")
+        	document.getElementById("h1_e").innerHTML=data.value[0]; 
+        	draw_eye_l_u(data.value[1]);
+			draw_eye_r_u(data.value[1]);
+			draw_eye_l_d(data.value[1]);
+			draw_eye_r_d(data.value[1]);
+			draw_mouth(data.value[2]);
+        }
+        /*    switch (data.type) {
+                    case 'state':
+                        value.textContent = data.value;
+                        break;
+                    case 'users':
+                        users.textContent = (
+                            data.count.toString() + " user" +
+                            (data.count == 1 ? "" : "s"));
+                        break;
+                    default:
+                        console.error(
+                            "unsupported event", data);
+                }*/
+            };
+
+ function send_feedback(){
+ 	if (document.getElementById("coherent").checked){
+ 		//console.log("Coherent")
+ 		//websocket.send("reward=0");
+ 		//websocket.send(JSON.stringify({action: 'reward', value:'0'}))
+ 		websocket.send(JSON.stringify({action:'reward', value:'10'}))
+ 		document.getElementById("coherent").checked=false
+ 	}
+ 	if (document.getElementById("incoherent").checked){
+ 		 //console.log("InCoherent")
+ 		//websocket.send("reward=1");
+ 		websocket.send(JSON.stringify({action:'reward', value:'2'}))
+ 		document.getElementById("incoherent").checked=false
+		//SEND message to server
+	}
+ 	//location.reload();
+ }
+
+///MOUTH AND EYES CONFIGURATION
+const radius=10; //original 20
+
+var canvas_eye_lu=document.getElementById("eye_l_u");
+var canvas_eye_ru=document.getElementById("eye_r_u");
+var canvas_eye_ld=document.getElementById("eye_l_d");
+var canvas_eye_rd=document.getElementById("eye_r_d");
+
+function draw_eye_l_u(eyes_conf) {
+    //var canvas = document.getElementById("eye_l_u");
+    //console.log("I am here")
+    var ctx = canvas_eye_lu.getContext("2d");
+    if (eyes_conf==0 || eyes_conf==2){
+      ctx.beginPath();
+      ctx.arc(90, 120, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(120, 70, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(180, 50, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(240, 70, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(270, 120, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+	}
+	else if (eyes_conf==3){
+      ctx.beginPath();
+      ctx.arc(180, 50, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(240, 70, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(270, 120, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+	}else if(eyes_conf==4){
+      ctx.beginPath();
+      ctx.arc(270, 120, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+	}else{
+        console.log("Eyes not active")
+	}
+}
+function draw_eye_r_u(eyes_conf) {
+    var ctx = canvas_eye_ru.getContext("2d");
+    if(eyes_conf==0 || eyes_conf==2){
+	  ctx.beginPath();
+      ctx.arc(90, 120, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(120, 70, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(180, 50, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(240, 70, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(270, 120, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+        }else if (eyes_conf== 3){
+	ctx.beginPath();
+      ctx.arc(90, 120, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(120, 70, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(180, 50, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+       }else if(eyes_conf==4){
+	ctx.beginPath();
+      ctx.arc(90, 120, radius, 0, 2 * Math.PI);
+      ctx.fillStyle="blue"
+      ctx.fill();
+     }else{
+        console.log("Eyes not active")
+	} 
+}
+function draw_eye_l_d(eyes_conf) {
+    var crd_ctx = canvas_eye_ld.getContext("2d");
+      if(eyes_conf==1 || eyes_conf==2){
+	crd_ctx.beginPath();
+        crd_ctx.arc(100, 20, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+        crd_ctx.beginPath();
+        crd_ctx.arc(150, 50, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+        crd_ctx.beginPath();
+        crd_ctx.arc(210, 50, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+	crd_ctx.beginPath();
+        crd_ctx.arc(260, 20, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+      }
+       else if (eyes_conf==4){
+	        crd_ctx.beginPath();
+        crd_ctx.arc(210, 50, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+        crd_ctx.beginPath();
+        crd_ctx.arc(260, 20, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+	}else{
+        console.log("Eyes not active")
+	 }
+ } 
+  function draw_eye_r_d(eyes_conf) {
+    var crd_ctx = canvas_eye_rd.getContext("2d");
+      if(eyes_conf==1 || eyes_conf==2){
+        crd_ctx.beginPath();
+        crd_ctx.arc(100, 20, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+        crd_ctx.beginPath();
+        crd_ctx.arc(150, 50, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+        crd_ctx.beginPath();
+        crd_ctx.arc(210, 50, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+        crd_ctx.arc(260, 20, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+
+     }else if (eyes_conf==4){
+        crd_ctx.beginPath();
+        crd_ctx.arc(100, 20, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+        crd_ctx.beginPath();
+        crd_ctx.arc(150, 50, radius, 0, 2 * Math.PI);
+        crd_ctx.fillStyle="blue"
+        crd_ctx.fill();
+	}else{
+        console.log("Eyes not active")
+	 }
+}
+const color="orange";
+const widthLine=10;
+var canvas_mouth=document.getElementById("mouth");
+function draw_mouth(mouth_conf) {
+    //var canvas = document.getElementById("eye_l_u");
+    //console.log("I am here")
+    var ctx = canvas_mouth.getContext("2d");
+	switch(mouth_conf){
+	case 0:
+	ctx.beginPath();
+        ctx.arc(15,75,5,0,2*Math.PI)
+        ctx.fillStyle=color;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(540,75,5,0,2*Math.PI)
+        ctx.fillStyle=color;
+        ctx.fill();
+	start_width=15
+	for(i=1;i<5;i++){
+                ctx.beginPath();
+                ctx.arc(15*i,90,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        	ctx.beginPath();
+		ctx.arc(480+(15*i),90,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+       start_width=18;
+        for(i=2;i<30;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,105,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+        for(i=3;i<29;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,130,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+        for(i=4;i<28;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,155,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+	break;
+	case 1:
+	ctx.beginPath();
+        ctx.arc(35,155,5,0,2*Math.PI)
+        ctx.fillStyle=color;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(515,155,5,0,2*Math.PI)
+        ctx.fillStyle=color;
+        ctx.fill();
+        start_width=15
+        for(i=1;i<4;i++){
+                ctx.beginPath();
+                ctx.arc(20+(15*i),130,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+                ctx.beginPath()
+                ctx.arc(470+(15*i),130,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+       start_width=18;
+        for(i=4;i<28;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,105,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      } 
+        for(i=5;i<27;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,90,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+
+        for(i=6;i<26;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,75,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+	break;
+	case 2:
+	start_width=18;
+        for(i=1;i<33;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,50,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	for (i=1;i<3;i++){
+		ctx.beginPath();
+                ctx.arc(start_width,50+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(576,50+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+
+	}
+	start_height=125
+	start_width_l=0
+	start_width_r=594
+	for (i=1;i<3;i++){
+                for(j=1;j<4;j++){
+                	ctx.beginPath();
+                	ctx.arc(start_width_l+(18*j),start_height,5,0,2*Math.PI)
+                	ctx.fillStyle=color;
+                	ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(start_width_r-(18*j),start_height,5,0,2*Math.PI)
+                        ctx.fillStyle=color;
+                        ctx.fill();
+                        temp_width_left=start_width_l+(18*j);
+			temp_width_right=start_width_r-(18*j);
+                }
+                start_width_l=temp_width_left-18;
+		start_width_r=temp_width_right+18;
+		start_height+=25;
+        }
+	start_width=18
+	for(i=6;i<28;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,start_height,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        }
+	break;
+        case 3:
+        start_width=18;
+        for(i=1;i<33;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,90,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+	//Tongue
+	start_width_l=380
+	start_width_r=550
+	start_height=90
+	for(i=1;i<3;i++){
+                ctx.beginPath();
+                ctx.arc(start_width_l,start_height+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(start_width_r,start_height+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	start_height=140
+        for(i=1;i<3;i++){
+                ctx.beginPath();
+                ctx.arc(start_width_l+(18*i),start_height+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(start_width_r-(18*i),start_height+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        }
+	start_height=190;
+	start_width_l=416
+	for (i=1;i<4; i++){
+		ctx.beginPath();
+                ctx.arc(start_width_l+(25*i),start_height,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	start_height=90;
+        start_width=465;
+        for (i=1;i<4; i++){
+                ctx.beginPath();
+                ctx.arc(start_width,start_height+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        }
+        break;
+	case 4:
+	start_width_l=18;
+	start_width_r=582
+	start_height=25;
+	for(i=1;i<6;i++){
+                ctx.beginPath();
+                ctx.arc(start_width_l+(18*i),start_height+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(start_width_r-(18*i),start_height+(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        }
+	start_width=110
+	for (i=1; i< 19; i++){
+	        ctx.beginPath();
+                ctx.arc(start_width+(20*i),185,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	//Tongue
+	for(i=1;i<4; i++){
+		ctx.beginPath();
+                ctx.arc(410,185-(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	ctx.beginPath();
+        ctx.arc(504,110,5,0,2*Math.PI)
+        ctx.fillStyle=color;
+        ctx.fill();
+	for(i=1; i<3; i++){
+		ctx.beginPath();
+                ctx.arc(410+(18*i),110-(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(504-(18*i),110-(25*i),5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	break;
+	case 5:
+        start_width=18;
+        start_height=25;
+        for (i=1;i<7;i++){
+                start_height=start_height+25;
+		for(j=1;j<6;j++){
+                ctx.beginPath();
+                ctx.arc(start_width+(18*j),start_height,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+		temp_width=start_width+(18*j);
+                }
+		start_width=temp_width;
+        }
+	break;
+	case 6:
+	start_width=18;
+	for(i=1;i<33;i++){
+		ctx.beginPath();
+		ctx.arc(start_width*i,90,5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+      }
+	break;
+	case 7:
+	start_height=25;
+	end_height=195;
+	start_width=250;
+	end_width=340;	
+	for(i=0;i<5; i++){
+		ctx.beginPath();
+		ctx.arc(start_width-(15*i),start_height+(18*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath();
+		ctx.arc(end_width+(15*i),start_height+(18*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath();
+		ctx.arc(start_width-(15*i),end_height-(18*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath();
+		ctx.arc(end_width+(15*i),end_height-(18*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+	}
+	for(i=1;i<6; i++){
+		ctx.beginPath();
+		ctx.arc(start_width+(18*i),start_height,5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath(); //internal up
+		ctx.arc(start_width+15 -(12*i),(start_height+5)+(15*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();		
+		ctx.beginPath(); 
+		ctx.arc(end_width-15+(12*i),(start_height+5)+(15*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath();
+		ctx.arc(start_width+(18*i),end_height,5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath(); //internal  down
+		ctx.arc(start_width+15-(12*i),(end_height-5)-(15*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath(); 
+		ctx.arc(end_width-15+(12*i),(end_height-5)-(15*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+	}
+	break;
+	case 8:
+        start_width=18;
+        for(i=3;i<30;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,75,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+		ctx.beginPath();
+                ctx.arc(start_width*i,105,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      } 
+        for(i=1;i<32;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,90,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+	break;
+	case 9:
+       start_width=18;
+        for(i=3;i<30;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,105,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      } 
+        for(i=1;i<32;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,90,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+      }
+	break;
+	case 10:
+	start_width=18;
+        for(i=1;i<32;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,75,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	start_height=90
+	start_width_l=0
+	start_width_r=576
+	for (i=1;i<3;i++){
+                for(j=1;j<4;j++){
+                	ctx.beginPath();
+                	ctx.arc(start_width_l+(18*j),start_height,5,0,2*Math.PI)
+                	ctx.fillStyle=color;
+                	ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(start_width_r-(18*j),start_height,5,0,2*Math.PI)
+                        ctx.fillStyle=color;
+                        ctx.fill();
+                        temp_width_left=start_width_l+(18*j);
+			temp_width_right=start_width_r-(18*j);
+                }
+                start_width_l=temp_width_left-18;
+		start_width_r=temp_width_right+18;
+		start_height+=25;
+        }
+	start_width=18
+	for(i=4;i<29;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,start_height,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        }
+	for(i=4;i<22;i++){
+                ctx.beginPath();
+                ctx.arc(start_width_l+(18*i),90,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        }
+	break;
+	case 11:
+       	start_width=18;
+       	for(i=2;i<31;i++){
+       	         ctx.beginPath();
+               ctx.arc(start_width*i,75,5,0,2*Math.PI)
+                ctx.fillStyle="orange";
+                ctx.fill();
+      	} 
+        for(i=1;i<32;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,90,5,0,2*Math.PI)
+                ctx.fillStyle="orange";
+                ctx.fill();
+      	}
+     	for(i=6;i<27;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,130,5,0,2*Math.PI)
+                ctx.fillStyle="orange";
+                ctx.fill();
+      	} 
+	break;
+	case 12:
+	start_height=75;
+	end_height=155;
+	start_width=250;
+	end_width=304;	
+	for(i=0;i<3; i++){
+		ctx.beginPath();
+		ctx.arc(start_width-(15*i),start_height+(18*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath();
+		ctx.arc(end_width+(15*i),start_height+(18*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath();
+		ctx.arc(start_width-(15*i),end_height-(18*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath();
+		ctx.arc(end_width+(15*i),end_height-(18*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+	}
+	for(i=1;i<3; i++){
+		ctx.beginPath();
+		ctx.arc(start_width+(18*i),start_height,5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath(); //internal up
+		ctx.arc(start_width+15 -(12*i),(start_height+5)+(15*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();		
+		ctx.beginPath(); 
+		ctx.arc(end_width-15+(12*i),(start_height+5)+(15*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath();
+		ctx.arc(start_width+(18*i),end_height,5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath(); //internal  down
+		ctx.arc(start_width+15-(12*i),(end_height-5)-(15*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+		ctx.beginPath(); 
+		ctx.arc(end_width-15+(12*i),(end_height-5)-(15*i),5,0,2*Math.PI)
+        	ctx.fillStyle=color;
+        	ctx.fill();
+	}
+	break;
+	case 13:
+	start_width=18; //smaller width 28
+        for(i=1;i<32;i++){ //smaller width 19
+                ctx.beginPath();
+                ctx.arc(start_width*i,75,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	start_height=90;
+	start_width_l=0;
+	start_width_r=576; //smaller width 536
+	for (i=1;i<4;i++){
+                for(j=1;j<3;j++){
+                	ctx.beginPath();
+                	ctx.arc(start_width_l+(18*j),start_height,5,0,2*Math.PI) //smaller width 28
+                	ctx.fillStyle=color;
+                	ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(start_width_r-(18*j),start_height,5,0,2*Math.PI) //smaller width 28
+                        ctx.fillStyle=color;
+                        ctx.fill();
+                        temp_width_left=start_width_l+(18*j); //smaller width 28
+			temp_width_right=start_width_r-(18*j); //smaller width 28
+                }
+                start_width_l=temp_width_left-18; //smaller width 28
+		start_width_r=temp_width_right+18; //smaller width 28
+		start_height+=25;
+        }
+	start_width=18; //smaller width 28
+	for(i=4;i<29;i++){ //smaller width 4 and 16
+                ctx.beginPath();
+                ctx.arc(start_width*i,start_height,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        }
+	break;
+	case 14:
+	start_width=18;
+        for(i=1;i<32;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,75,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+	}
+	start_height=90
+	start_width_l=0
+	start_width_r=576
+	for (i=1;i<3;i++){
+                for(j=1;j<4;j++){
+                	ctx.beginPath();
+                	ctx.arc(start_width_l+(18*j),start_height,5,0,2*Math.PI)
+                	ctx.fillStyle=color;
+                	ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(start_width_r-(18*j),start_height,5,0,2*Math.PI)
+                        ctx.fillStyle=color;
+                        ctx.fill();
+                        temp_width_left=start_width_l+(18*j);
+			temp_width_right=start_width_r-(18*j);
+                }
+                start_width_l=temp_width_left-18;
+		start_width_r=temp_width_right+18;
+		start_height+=25;
+        }
+	start_width=18
+	for(i=4;i<29;i++){
+                ctx.beginPath();
+                ctx.arc(start_width*i,start_height,5,0,2*Math.PI)
+                ctx.fillStyle=color;
+                ctx.fill();
+        }
+	break;
+	default:
+        console.log("Mouth not active");
+	}
+}
+ </script>
+
+</body>
+
+</html>
